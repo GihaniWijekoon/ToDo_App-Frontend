@@ -1,17 +1,23 @@
-import React from "react";
+import React from 'react';
+import '../App.css';
 
 const Dashboard = ({ tasks }) => {
-  const completedTasks = tasks.filter((task) => task.completed).length;
-  const pendingTasks = tasks.length - completedTasks;
+  const completedTasks = tasks.filter((task) => task.status === 'Completed').length;
+  const pendingTasks = tasks.filter((task) => task.status !== 'Completed').length;
 
   return (
-    <div className="p-4 border border-gray-300 rounded shadow-md w-80">
-      <h3 className="text-xl font-bold mb-2">Task Summary</h3>
-      <p className="text-green-500">Completed: {completedTasks}</p>
-      <p className="text-red-500">Pending: {pendingTasks}</p>
-      <p className="text-blue-500">Total: {tasks.length}</p>
+    <div className="dashboard-summary">
+      <div className="summary-box">
+        <h3>COMPLETED TASKS</h3>
+        <p>{completedTasks}</p>
+      </div>
+      <div className="summary-box">
+        <h3>PENDING TASKS</h3>
+        <p>{pendingTasks}</p>
+      </div>
     </div>
   );
 };
 
 export default Dashboard;
+

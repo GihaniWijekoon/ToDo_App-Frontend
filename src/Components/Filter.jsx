@@ -1,23 +1,24 @@
-import React from "react";
+import React from 'react';
+import '../App.css';
 
-const Filter = ({ filter, setFilter }) => {
+const Filter = ({ filter, onFilterChange }) => {
   return (
-    <div className="flex gap-2 mb-4">
+    <div className="filter">
       <button
-        className={`p-2 rounded ${filter === "all" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-        onClick={() => setFilter("all")}
+        onClick={() => onFilterChange('All')}
+        className={`filter-button ${filter === 'All' ? 'active' : ''}`}
       >
         All
       </button>
       <button
-        className={`p-2 rounded ${filter === "active" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-        onClick={() => setFilter("active")}
+        onClick={() => onFilterChange('Active')}
+        className={`filter-button ${filter === 'Active' ? 'active' : ''}`}
       >
         Active
       </button>
       <button
-        className={`p-2 rounded ${filter === "completed" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-        onClick={() => setFilter("completed")}
+        onClick={() => onFilterChange('Completed')}
+        className={`filter-button ${filter === 'Completed' ? 'active' : ''}`}
       >
         Completed
       </button>

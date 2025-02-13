@@ -1,94 +1,65 @@
-// TodoItem.jsx
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import '../App.css';
 
-const TodoItem = ({ task, onDelete, onToggleComplete, onEdit }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(task.text);
+const TodoItem = ({ task, onDelete, onEdit }) => {
 
-  // Toggle the task's completed status
-  const handleToggle = () => {
-    onToggleComplete(task.id);
-  };
+    const [showModal, setShowModal] = useState(false);
+    const [taskTitle, setTaskTitle] = useState(task.title);
+    const [taskDescription, setTaskDescription] = useState(task.description);
 
-  // Delete the task
+    // Called when the Delete button is clicked
   const handleDelete = () => {
     onDelete(task.id);
   };
 
-  // Start editing mode
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
-  // Save the edited text
   const handleSave = () => {
-    onEdit(task.id, editText);
-    setIsEditing(false);
-  };
-
-  // Cancel editing and revert the text
-  const handleCancel = () => {
-    setEditText(task.text);
-    setIsEditing(false);
+    const updatedTask = {
+        id: task.id,
+        title: taskTitle,
+        description: taskDescription,
+        isCompleted: task.isCompleted // maintain the current completion status
+      };
+    onEdit(updatedTask);  // Call the parent component's function to update the task
+    setShowModal(false);  // Close the modal after saving
   };
 
   return (
-    <li className="flex items-center justify-between p-2 border border-gray-300 mb-2 rounded">
-      <div className="flex items-center">
-        {/* Checkbox for marking task as completed */}
-        <input
-          type="checkbox"
-          checked={task.completed}
-          onChange={handleToggle}
-          className="mr-2"
-        />
-        {isEditing ? (
-          <input
-            type="text"
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            className="p-1 border border-gray-300 rounded"
-          />
-        ) : (
-          <span className={task.completed ? "line-through" : ""}>
-            {task.text}
-          </span>
-        )}
+    <div className="todo-item">
+      <h3>{task.title}</h3>
+      <p>{task.description}</p>
+      <p>Start date: {task.createdAt.split('T')[0]}</p>
+      <div className="todo-actions">
+        <button className="complete-btn">
+          {task.status === 'Completed' ? 'Mark as Active' : 'Mark as Completed'}
+        </button>
+        <button className="delete-btn" onClick={handleDelete} >Delete</button>
+        
+        <button className="edit-btn" onClick={() => setShowModal(true)}>Edit</button>
+
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Edit Task</h2>
+            <label>Task Title:</label>
+            <input
+              type="text"
+              value={taskTitle}
+              onChange={(e) => setTaskTitle(e.target.value)}
+            />
+            <label>Task Description:</label>
+            <input
+              type="text"
+              value={taskDescription}
+              onChange={(e) => setTaskDescription(e.target.value)}
+            />
+            <button onClick={handleSave}>Save</button>
+            <button onClick={() => setShowModal(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
       </div>
-      <div>
-        {isEditing ? (
-          <>
-            <button
-              onClick={handleSave}
-              className="bg-green-500 text-white p-1 rounded mr-1"
-            >
-              Save
-            </button>
-            <button
-              onClick={handleCancel}
-              className="bg-gray-500 text-white p-1 rounded"
-            >
-              Cancel
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              onClick={handleEditClick}
-              className="bg-yellow-500 text-white p-1 rounded mr-1"
-            >
-              Edit
-            </button>
-            <button
-              onClick={handleDelete}
-              className="bg-red-500 text-white p-1 rounded"
-            >
-              Delete
-            </button>
-          </>
-        )}
-      </div>
-    </li>
+    </div>
   );
 };
 
