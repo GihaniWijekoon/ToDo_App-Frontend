@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import "./Login.css";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -20,27 +21,41 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h2 className="text-2xl font-bold mb-4">Login</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col w-80">
-        <input
-          type="email"
-          placeholder="Email"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="mb-2 p-2 border border-gray-300 rounded"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="mb-2 p-2 border border-gray-300 rounded"
-          required
-        />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded">Login</button>
-      </form>
+    <div className="login-container">
+      <div className="login-left">
+        <h2>Hello, Welcome!</h2>
+        <p>Don't have an account?</p>
+        <button onClick={() => navigate("/register")} className="register-btn">
+          Register
+        </button>
+      </div>
+      <div className="login-right">
+        <h2 className="login-title">Login</h2>
+        <form onSubmit={handleSubmit} className="login-form">
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="input-field"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="input-field"
+            required
+          />
+          <a href="#" className="forgot-password">
+            Forgot password?
+          </a>
+          <button type="submit" className="login-btn">
+            Login
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

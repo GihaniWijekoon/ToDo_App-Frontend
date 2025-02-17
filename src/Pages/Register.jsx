@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import "./Register.css";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -19,27 +20,42 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h2 className="text-2xl font-bold mb-4">Register</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col w-80">
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="mb-2 p-2 border border-gray-300 rounded"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="mb-2 p-2 border border-gray-300 rounded"
-          required
-        />
-        <button type="submit" className="bg-green-500 text-white p-2 rounded">Register</button>
-      </form>
+    <div className="register-container">
+      <div className="register-left">
+        <h2>Welcome Back!</h2>
+        <p>Already have an account? Sign in to continue your journey</p>
+        <button className="signin-btn" onClick={() => navigate("/login")}>
+          Sign In
+        </button>
+      </div>
+      <div className="register-right">
+        <h2 className="register-title">Create Account</h2>
+        <form onSubmit={handleSubmit} className="register-form">
+          <div className="input-group">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input-field"
+              required
+            />
+          </div>
+          <div className="input-group">
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input-field"
+              required
+            />
+          </div>
+          <button type="submit" className="register-submit-btn">
+            Create Account
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

@@ -2,36 +2,52 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import Dashboard from '../Components/Dashboard';
-import Filter from '../Components/Filter';
-import TodoList from '../Components/TodoList';
+import Dashboard from "../Components/Dashboard";
+import Filter from "../Components/Filter";
+import TodoList from "../Components/TodoList";
+import Calendar from "../Components/Calendar";
+import "./Tododashboard.css";
+import Logo from "../assets/images/TodoLogo.png";
+import { CirclePlus } from "lucide-react";
 
 const TodoDashboard = () => {
-
   const { auth, logout } = useAuth();
   const navigate = useNavigate();
 
   const [tasks, setTasks] = useState([]);
-  const [filter, setFilter] = useState('All');
-  const [newTaskTitle, setNewTaskTitle] = useState('');
-  const [newTaskDescription, setNewTaskDescription] = useState('');
+  const [filter, setFilter] = useState("All");
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskDescription, setNewTaskDescription] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        if (!auth) {
+        const token = localStorage.getItem("token");
+        if (!token) {
           console.error("No auth token available");
           return;
         }
 
-        const response = await axios.get("http://localhost:5164/api/ToDo", {
-          headers: { 
-            'Authorization': `Bearer ${auth}`,
-            'Content-Type': 'application/json'
-          },
-          withCredentials: true // Add this line
-        });
-        console.log("hiiiii", response.data)
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          console.error("User ID not found in localStorage");
+          return;
+        }
+        console.log("Token being sent:", token);
+        console.log("User ID being sent in URL:", userId);
+
+        const response = await axios.get(
+          `http://localhost:5164/api/ToDo/user/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        console.log("task", response.data);
         setTasks(response.data);
       } catch (error) {
         if (error.response?.status === 401) {
@@ -55,22 +71,30 @@ const TodoDashboard = () => {
       alert("Please enter both a title and a description.");
       return;
     }
-  
+
     try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        console.error("User ID not found in localStorage");
+        return;
+      }
+
       const response = await axios.post(
-        "http://localhost:5164/api/ToDo",
+        `http://localhost:5164/api/ToDo/user/${userId}`,
         { title: newTaskTitle, description: newTaskDescription },
         {
-          headers: { 
-            Authorization: `Bearer ${auth}`, 
-            'Content-Type': 'application/json' 
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+            "Content-Type": "application/json",
           },
-          withCredentials: true // Add this line to send cookies with the request
+          withCredentials: true,
         }
       );
+
       setTasks([...tasks, response.data]);
-      setNewTaskTitle('');
-      setNewTaskDescription('');
+      setNewTaskTitle("");
+      setNewTaskDescription("");
+      setShowModal(false);
     } catch (error) {
       if (error.response?.status === 401) {
         console.error("Authentication failed - invalid or expired token");
@@ -80,18 +104,18 @@ const TodoDashboard = () => {
       }
     }
   };
-  
 
   const handleDeleteTask = async (id) => {
     try {
+      const token = localStorage.getItem("token");
       await axios.delete(`http://localhost:5164/api/ToDo/${id}`, {
-        headers: { 
-          Authorization: `Bearer ${auth}`, 
-          'Content-Type': 'application/json' 
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        withCredentials: true // Ensures cookies (authentication) are sent
+        withCredentials: true,
       });
-  
+
       setTasks(tasks.filter((task) => task.id !== id));
     } catch (error) {
       if (error.response?.status === 401) {
@@ -102,79 +126,142 @@ const TodoDashboard = () => {
       }
     }
   };
-  
 
   const handleEditTask = async (updatedTask) => {
-  try {
-    const taskUpdate = {
+    try {
+      const taskUpdate = {
         id: updatedTask.id,
         title: updatedTask.title,
         description: updatedTask.description,
-        isCompleted: updatedTask.isCompleted
-        // Don't send userId unless you're specifically updating it
+        isCompleted: updatedTask.isCompleted,
       };
-    const response = await axios.put(
-      `http://localhost:5164/api/ToDo/${updatedTask.id}`,
-      updatedTask,
-      {
-        headers: { 
-          Authorization: `Bearer ${auth}`, 
-          'Content-Type': 'application/json' 
-        },
-        withCredentials: true // Ensures cookies (authentication) are sent
+      const response = await axios.put(
+        `http://localhost:5164/api/ToDo/${updatedTask.id}`,
+        updatedTask,
+        {
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => (t.id === updatedTask.id ? response.data : t))
+      );
+    } catch (error) {
+      if (error.response?.status === 401) {
+        console.error("Authentication failed - invalid or expired token");
+        console.log("Full error response:", error.response);
+      } else {
+        console.error("Error editing task:", error);
       }
-    );
-
-    // Update the tasks array with the new data from the response
-    setTasks((prevTasks) =>
-      prevTasks.map((t) => (t.id === updatedTask.id ? response.data : t))
-    );
-  } catch (error) {
-    if (error.response?.status === 401) {
-      console.error("Authentication failed - invalid or expired token");
-      console.log("Full error response:", error.response);
-    } else {
-      console.error("Error editing task:", error);
     }
-  }
-};
+  };
 
+  const toggleTaskCompletion = async (taskId) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5164/api/todo/toggle-completion/${taskId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === 200) {
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.id === taskId
+              ? { ...task, isCompleted: !task.isCompleted }
+              : task
+          )
+        );
+        return response.data;
+      }
+    } catch (error) {
+      console.error("Error updating task status:", error);
+      throw new Error("Failed to update task status");
+    }
+  };
 
   return (
-    <div className="todo-dashboard">
-    <button onClick={logout}>Logout</button>
-        <h1>Hello, Aqeel, Start planning today</h1>
-        <div className="date-section">
-            <h2>Sunday</h2>
-            <p>04, April 2024</p>
+    <div className="dashboard-container">
+      <div className="column column-1">
+        <div className="app-logo">
+          <img src={Logo} alt="Logo" width="100" />
         </div>
-
-        <div className="add-task-section">
-        <input
-          type="text"
-          className="task-input"
-          placeholder="Type Title Of Task"
-          value={newTaskTitle}
-          onChange={(e) => setNewTaskTitle(e.target.value)}
-        />
-        <input
-          type="text"
-          className="task-input"
-          placeholder="Detail Of Your Task"
-          value={newTaskDescription}
-          onChange={(e) => setNewTaskDescription(e.target.value)}
-        />
-        <button className="add-task-btn" onClick={addTask}>+</button>
+        <nav className="nav-menu">
+          <button className="nav-item active">Dashboard</button>
+          <button className="nav-item" onClick={logout}>
+            Log Out
+          </button>
+        </nav>
       </div>
 
-        <Dashboard tasks={tasks} />
+      <div className="column column-2">
+        <div className="title">
+          <h2>ToDoZen</h2>
+        </div>
+        <div className="add-task-section">
+          <div>
+            <button className="add-task-btn" onClick={() => setShowModal(true)}>
+              <div className="add-task-btn-icon">
+                <CirclePlus size={24} color="white" />
+                Add Task
+              </div>
+            </button>
+            {showModal && (
+              <div className="modal">
+                <div className="modal-content">
+                  <h2>Add Task</h2>
+                  <label>Task Title:</label>
+                  <input
+                    type="text"
+                    placeholder="Enter task title"
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                  />
+                  <label>Task Description:</label>
+                  <textarea
+                    placeholder="Enter task description"
+                    rows="4"
+                    value={newTaskDescription}
+                    onChange={(e) => setNewTaskDescription(e.target.value)}
+                  />
+                  <div className="button-group">
+                    <button onClick={addTask}>Add Task</button>
+                    <button onClick={() => setShowModal(false)}>Cancel</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         <Filter filter={filter} onFilterChange={handleFilterChange} />
-        <TodoList 
-            tasks={tasks} 
-            filter={filter}
-            onDelete={handleDeleteTask}
-            onEdit={handleEditTask}
-    />
+        <TodoList
+          tasks={tasks}
+          filter={filter}
+          onDelete={handleDeleteTask}
+          onEdit={handleEditTask}
+          onChangeStatus={toggleTaskCompletion}
+        />
+      </div>
+
+      <div className="column column-3">
+        <div className="calendar-section">
+          <Calendar value={new Date()} />
+        </div>
+        <div className="summary-section">
+          <Dashboard tasks={tasks} />
+        </div>
+      </div>
     </div>
   );
 };

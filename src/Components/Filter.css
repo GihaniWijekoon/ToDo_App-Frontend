@@ -1,0 +1,57 @@
+/* Filter Styles */
+.filter {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.filter-button {
+  background: transparent;
+  border: none;
+  padding: 0.75rem 0.5rem;
+  cursor: pointer;
+  color: #86756a;
+  font-size: 0.95rem;
+  font-weight: 500;
+  position: relative;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.filter-button.active {
+  color: #86756a;
+  opacity: 1;
+  font-weight: 600;
+}
+
+.filter-button.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #6b8e9e;
+  border-radius: 2px;
+}
+
+.filter-button:hover {
+  opacity: 1;
+}
+
+.filter-button:focus {
+  outline: none;
+}
+
+.filter-button:not(.active):hover::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #e0e0e0;
+  border-radius: 2px;
+}
