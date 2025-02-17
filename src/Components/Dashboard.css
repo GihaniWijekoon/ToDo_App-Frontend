@@ -10,7 +10,7 @@
 .summary-box {
   background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
   border-radius: 16px;
-  padding: 2rem;
+  padding-bottom: 1rem;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.04),
     0 0 1px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.7);
@@ -57,30 +57,44 @@
   line-height: 1;
 }
 
-.summary-box:nth-child(1) {
+.summary-box1{
+    background: linear-gradient(135deg,#f1f5f9 0%, #e2e8f0 100%);
+  }
+  
+  .summary-box1 h3 {
+    color: #475569;
+    text-align: center;
+  }
+  
+  .summary-box1 p {
+    color: #334155;
+    text-align: center;
+  }
+
+.summary-box2{
   background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
 }
 
-.summary-box:nth-child(1) h3 {
+.summary-box2 h3 {
   color: #2f855a;
   text-align: center;
 }
 
-.summary-box:nth-child(1) p {
+.summary-box2 p {
   color: #246c4d;
   text-align: center;
 }
 
-.summary-box:nth-child(2) {
+.summary-box3 {
   background: linear-gradient(135deg, #fff5f5 0%, #fef5ea 100%);
 }
 
-.summary-box:nth-child(2) h3 {
+.summary-box3 h3 {
   color: #c53030;
   text-align: center;
 }
 
-.summary-box:nth-child(2) p {
+.summary-box3 p {
   color: #c53030;
   text-align: center;
 }
